@@ -26,30 +26,29 @@ app.get( '/', function( request, response ){
     UserModel
         .getUsers()
         .then( data => {
-            console.log( data );
             response.render( 'viewAll', { users : data } );
         });
 });
 
-app.get( '/users/getById', function( request, response ){
-    let id = Number( request.query.id );
+// app.get( '/users/getById', function( request, response ){
+//     let id = Number( request.query.id );
 
-    UserModel
-        .getUserById( id )
-        .then( result => {
-            if( result === null ){
-                throw new Error( "That user doesn't exist" );
-            }
-            response.render( 'user', { found: true, user: result } );
-        })
-        .catch( error => {
-            response.render( 'user', { found: false } );
-        });
-});
+//     UserModel
+//         .getUserById( id )
+//         .then( result => {
+//             if( result === null ){
+//                 throw new Error( "That user doesn't exist" );
+//             }
+//             response.render( 'user', { found: true, user: result } );
+//         })
+//         .catch( error => {
+//             response.render( 'user', { found: false } );
+//         });
+// });
 
 app.get( '/users/:id', function( request, response ){
-    let id = Number( request.params.id );
-
+    let id = request.params.id;
+    console.log(id);
     UserModel
         .getUserById( id )
         .then( result => {
@@ -92,7 +91,7 @@ app.post( '/mongooses', function( request, response ){
 });
 
 app.get( '/mongooses/edit/:id', function( request, response ){
-    let id = Number( request.params.id );
+    let id = request.params.id;
     UserModel
         .getUserById( id )
         .then( result => {
@@ -109,20 +108,21 @@ app.get( '/mongooses/edit/:id', function( request, response ){
 });
 
 app.post( '/mongooses/:id', function( request, response ){
+    let id = request.params.id;
     console.log( request.body );
     const name = request.body.name;
     const type = request.body.type;
     const age = Number(request.body.age);
 
     // Run validations to see if the 'id' is not already in the list
-    const newAnimal = {
+    const editAnimal = {
         name,
         type,
         age
     };
-    console.log( newAnimal );
+    console.log(id, editAnimal );
     UserModel
-        .createUser( newAnimal )
+        .updateAnimal(id, editAnimal )
         .then( result => {
             console.log( result );
         })
@@ -135,9 +135,10 @@ app.post( '/mongooses/:id', function( request, response ){
 });
 
 app.get( '/mongooses/destroy/:id', function( request, response ){
-    let id = Number( request.params.id );
+    let id = request.params.id;
 
-    UserModel.removeAnimal(id)
+    UserModel
+        .removeAnimal(id)
         .then( result => {
             console.log(result);
             response.redirect( '/' );
